@@ -1,0 +1,11 @@
+{
+"title": "name",
+"birthdate": "birthDate",
+"birthYear": "birthDate",
+"suburb": "address",
+"birthplace": "birthPlace",
+"rightsHolder": "copyrightHolder",
+"rights": "copyright",
+"biographicalText": "description",
+"relation": "relatedLink"
+}
