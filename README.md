@@ -114,10 +114,12 @@ changed to name. This example ships with a file that does the mapping: ex
 
 -  Fix the CONTEXT file so it is datacrate_ready using the file supplied to map keys in the JSON-LD created above to DataCrate-friendly keys:
 
+    ```
     python doctor_datacrate.py \
            -m examples/f2f/farms_to_freeways_mapping.json\
            ~/working/f2f/data_migration/CATALOG_raw.json\
           ~/working/f2f/farms_to_freeways/CATALOG.json
+     ```
 
 # Use Calcyte.js to bag the content and create a index.html
 
@@ -125,7 +127,9 @@ To generate HTML (-g), bag (-b) and zip (-z) ```~/working/f2f/farms_to_freeways/
 
 -  use this command:
 
-   calcyfy -z  -g  -b ~/working/f2f/bags/ ~/working/f2f/farms_to_freeways/
+    ```
+    calcyfy -z  -g  -b ~/working/f2f/bags/ ~/working/f2f/farms_to_freeways/
+    ```
 
 
 
@@ -138,5 +142,10 @@ Full instructions coming at some point, but:
 -  Load the Schema.org vocab into Omeka S
 
 -  Run this:
-
-    python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV     -u http://localhost/api/ -s ~/working/f2f/data_migration/saved_ids  ~/working/f2f/farms_to_freeways/CATALOG.json
+    ```
+    python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u\
+                  -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV \ 
+                  -u http://localhost/api/ \
+                  -s ~/working/f2f/data_migration/saved_ids  \
+                  ~/working/f2f/farms_to_freeways/CATALOG.json
+    ```
