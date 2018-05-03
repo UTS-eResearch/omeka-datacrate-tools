@@ -112,7 +112,7 @@ Once you have run ```omeka_classic_to_datacrate.py``` there should be
 DataCrate-type CATALOG file in migration-data. This file will not be ready to
 use, as the properties and types used in it don't match the DataCrate context
 (which is based on schema.org). For example, the "title" item needs to be
-changed to name. This example ships with a file that does the mapping: ex
+changed to name. This example ships with a file that does the mapping: ```examples/f2f/farms_to_freeways_mapping.json```.
 
 -  Fix the CONTEXT file so it is datacrate_ready using the file supplied to map keys in the JSON-LD created above to DataCrate-friendly keys:
 
