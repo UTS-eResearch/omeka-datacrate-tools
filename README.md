@@ -87,11 +87,13 @@ and HTML index page drom the CATALOG.json file created by
 
 -  For this example use this command:
 
+    ```
      python omeka_classic_to_datacrate.py \
          -d ~/working/f2f/farms_to_freeways/files  \
          -u  http://omeka.uws.edu.au/farmstofreeways/api \
          -m ./examples/f2f/F2F-CATALOG-template.json \
          ~/working/f2f/data_migration/CATALOG_raw.json
+    ```
 
 
 
