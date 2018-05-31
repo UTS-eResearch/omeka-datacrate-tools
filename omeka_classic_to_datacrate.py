@@ -25,7 +25,7 @@ import pickle
 import sys
 
 
-def deal_with_files(graph, item_json, item):
+def deal_with_files(graph, item_json, item, data_dir):
     """Handle any dowloads, cache as files locally, then upload all files"""
     print("Dealing with files")
 
@@ -71,11 +71,19 @@ def deal_with_files(graph, item_json, item):
 
                     # except:
                     # print ("Some kind of download error happened fetching %s - pressing on" % file_url)
+                file_rel_path = os.path.join(
+                    os.path.basename(data_dir), os.path.relpath(file_path, data_dir)
+                )
+                graph.append(
+                    {"@type": "File", "path": file_rel_path, "@id": file_rel_path}
+                )
+                if file_type == "thumbnail":
+                    print("Thumb!", file_rel_path)
+                    item_json["thumbnail"] = {"@id": file_rel_path}
 
-                graph.append({"@type": "File", "path": file_path, "@id": file_path})
                 if "hasFile" not in item_json:
                     item_json["hasFile"] = []
-                item_json["hasFile"].append({"@id": file_path})
+                item_json["hasFile"].append({"@id": file_rel_path})
 
 
 class Elements:
@@ -169,7 +177,7 @@ def load_collections(endpoint, api_key, data_dir, catalog, parts):
         print("Got a set of %s collections" % len(items))
         for item in items:
             id = str(item["url"])
-            item_json = {"@id": id, "@type": ["Collection"]}
+            item_json = {"@id": id, "@type": ["RepositoryCollection"]}
 
             for val in item["element_texts"]:
                 text = val["text"]
@@ -190,10 +198,14 @@ def load_collections(endpoint, api_key, data_dir, catalog, parts):
 
 def load_items(endpoint, api_key, data_dir, metadata_file):
     if metadata_file:
-        catalog = json.loads(open(metadata_file, 'r').read())
+        catalog = json.loads(open(metadata_file, "r").read())
 
     else:
-        catalog = {"@graph": [{"@id": "Anonymous_datacrate", "path": "./", "@type": ["Dataset"]}]}
+        catalog = {
+            "@graph": [
+                {"@id": "Anonymous_datacrate", "path": "./", "@type": ["Dataset"]}
+            ]
+        }
 
     graph = catalog["@graph"]
     graph[0]["hasPart"] = []
@@ -212,7 +224,7 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
         print("Got a set of %s items" % len(items))
         for item in items:
             id = str(item["url"])
-            item_json = {"@id": id, "@type": ["Object"]}
+            item_json = {"@id": id, "@type": ["RepositoryObject"]}
             if "item_type" in item and item["item_type"] and "id" in item["item_type"]:
                 item_type = item["item_type"]["id"]
                 item_type_stash.get_item_type_name(item_json, item_type)
@@ -250,7 +262,7 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
                 graph.append(place_json)
                 item_json["contentLocation"] = {"@id": place_url}
 
-            deal_with_files(graph, item_json, item)
+            deal_with_files(graph, item_json, item, data_dir)
 
             get_relations(item_json, id)
             # print(json.dumps(item_json, indent=4))
@@ -280,11 +292,11 @@ if __name__ == "__main__":
         help="Path to a directory in which to cache dowloads (defaults to ./data)",
     )
     parser.add_argument(
-            "-m",
-            "--metadata",
-            default=None,
-            help="Datacrate Metadata file (CATALOG.json) to use as a base.",
-        )
+        "-m",
+        "--metadata",
+        default=None,
+        help="Datacrate Metadata file (CATALOG.json) to use as a base.",
+    )
     parser.add_argument(
         "outfile", nargs="?", type=argparse.FileType("w"), default=sys.stdout
     )

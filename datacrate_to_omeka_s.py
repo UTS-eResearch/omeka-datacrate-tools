@@ -126,7 +126,7 @@ props = Properties()
 classes = Resource_classes()
 
 # Item sets (collections)
-for item in [col for col in dc["@graph"] if  "Collection"  in col["@type"] ]:
+for item in [col for col in dc["@graph"] if  "RepositoryCollection"  in col["@type"] ]:
     item_set_to_upload = {}
     id = item["@id"]
     for (k, v) in item.items():
@@ -168,7 +168,7 @@ for item in [col for col in dc["@graph"] if  "Collection"  in col["@type"] ]:
 
 
 
-for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
+for item in [col for col in dc["@graph"] if "RepositoryCollection" not in col["@type"]]:
     item_to_upload = {"o:item_set": []}
     id = item["@id"]
 

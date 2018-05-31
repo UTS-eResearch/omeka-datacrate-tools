@@ -2,7 +2,7 @@
 "@graph":
 [
   {
-    "@id" : "http://dx.doi.org/10.4225/35/555d661071c76",
+    "@id" : "https://dx.doi.org/10.4225/35/555d661071c76",
     "name": "Farms to Freeways: demonstration DataCrate",
     "description": "This data set was exported from an Omeka Repository as an example of a DataCrate. It contains the Collections and Items from the repository but does NOT have the exhibitions. The DOI resolves to an archive of the data elsewhere",
     "publisher": {"@id": "http://westernsydney.edu.au"},
