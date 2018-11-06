@@ -108,9 +108,11 @@ class Relations:
     def get_relation_name(self, id):
         if id not in self.relation_names:
             r = requests.get(
-                endpoint + "/item_relations_properties/" + str(id), params=auth
+                endpoint + "/item_relations_properties/" + str(id)
             )
+            print(endpoint + "/item_relations_properties/" + str(id))
             element = json.loads(r.content)
+            print(element)
             self.relation_names[id] = element["local_part"]
         return self.relation_names[id]
 
@@ -122,7 +124,7 @@ class ItemTypes:
 
     def get_item_type_name(self, item_json, id):
         if id not in self.item_types:
-            r = requests.get(endpoint + "/item_types/" + str(id), params=auth)
+            r = requests.get(endpoint + "/item_types/" + str(id))
             element = json.loads(r.content)
             print("EL", element)
             self.item_types[id] = element["name"]
@@ -135,11 +137,16 @@ item_type_stash = ItemTypes()
 
 def get_relations(item_json, id):
     """ Find all inter-related items. Note that this will fail for more than 50 relations"""
-    r = requests.get(endpoint + "/item_relations", params={"subject_item_id": str(id)})
+    
+    r = requests.get(endpoint + "/item_relations?subject_item_id=%s" % (str(id)) )
     relations = json.loads(r.content)
+    print(endpoint + "/item_relations?subject_item_id=%s"  % (str(id)))
     for rel in relations:
-        relation_name = relation_stash.get_relation_name(rel["property_id"])
+        #relation_name = relation_stash.get_relation_name(rel["property_id"])
+        #print(rel)
+        relation_name = rel["property_local_part"]
         item_json[relation_name] = {"@id": str(rel["object_item_id"])}
+        print("RELATION", {"@id": str(rel["object_item_id"])})
 
     # {'id': 165, 'subject_item_id': 149,
     # 'property_id': 39, 'object_item_id': 167, 'property_vocabulary_id': 1, 'pro
@@ -161,7 +168,7 @@ def get_collection_members(id, item_json):
             break
         for item in items:
             print("Member", item["url"])
-            item_json["hasMember"].append({"@id": item["url"]})
+            item_json["hasMember"].append({"@id": str(item["id"])})
         return (item_json)
 
 
@@ -177,7 +184,7 @@ def load_collections(endpoint, api_key, data_dir, catalog, parts):
         print("Got a set of %s collections" % len(items))
         for item in items:
             id = str(item["url"])
-            item_json = {"@id": id, "@type": ["RepositoryCollection"]}
+            item_json = {"@id": str(id), "@type": ["RepositoryCollection"]}
 
             for val in item["element_texts"]:
                 text = val["text"]
@@ -191,7 +198,7 @@ def load_collections(endpoint, api_key, data_dir, catalog, parts):
                 item_json[el_name].append(text)
 
             item_json = get_collection_members(item["id"], item_json)
-            parts.append({"@id": id})
+            parts.append({"@id": str(id)})
             catalog["@graph"].append(item_json)
     return (catalog)
 
@@ -223,8 +230,8 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
 
         print("Got a set of %s items" % len(items))
         for item in items:
-            id = str(item["url"])
-            item_json = {"@id": id, "@type": ["RepositoryObject"]}
+            id = item["id"]
+            item_json = {"@id": str(id), "@type": ["RepositoryObject"]}
             if "item_type" in item and item["item_type"] and "id" in item["item_type"]:
                 item_type = item["item_type"]["id"]
                 item_type_stash.get_item_type_name(item_json, item_type)
@@ -249,13 +256,15 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
                 place_json = {"@id": place_url, "@type": "Place"}
                 if "address" in place:
                     place_json["address"] = place["address"]
-
+                    place_json["@label"] = place["address"]
                 if "latitude" in place and "longitude" in place:
                     geo_json = {
                         "@id": place_url + "#GEO",
                         "latitude": str(place["latitude"]),
                         "longitude": str(place["longitude"]),
                         "@type": "GeoCoordinates",
+                        "@label": "Lat: %s Long: %s "
+                        % (str(place["latitude"]), str(place["longitude"])),
                     }
                     place_json["geo"] = {"@id": place_url + "#GEO"}
                     graph.append(geo_json)

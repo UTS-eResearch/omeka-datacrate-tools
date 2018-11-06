@@ -136,7 +136,11 @@ Full instructions coming at some point, but:
 -  Install Omeka S
 
 -  Load the Schema.org vocab into Omeka S
+   - Go to https://schema.org/docs/developers.html
+   -  Download the Vocabulary definition file for schema in Format: Triples
+   -  In Omeka S, click on Vocabularies and add schema.nt
+   -
 
 -  Run this:
 
-    python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV     -u http://localhost/api/ -s ~/working/f2f/data_migration/saved_ids  ~/working/f2f/farms_to_freeways/CATALOG.json
+    python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV     -u http://localhost/api/ -s ~/working/f2f/data_migration/saved_ids -d ~/working/f2f/data_migration/s ~/working/f2f/farms_to_freeways/CATALOG.json

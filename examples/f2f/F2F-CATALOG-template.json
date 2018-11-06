@@ -1,47 +1,47 @@
 {
-"@graph":
-[
-  {
-    "@id" : "https://dx.doi.org/10.4225/35/555d661071c76",
-    "name": "Farms to Freeways: demonstration DataCrate",
-    "description": "This data set was exported from an Omeka Repository as an example of a DataCrate. It contains the Collections and Items from the repository but does NOT have the exhibitions. The DOI resolves to an archive of the data elsewhere",
-    "publisher": {"@id": "http://westernsydney.edu.au"},
-    "datePublished": "2015",
-    "@type" : "Dataset",
-    "path" : "./",
-    "name":  "Farms to Freeways Example Dataset",
-    "creator": [
-        {"@id": "http://nla.gov.au/anbd.aut-an35048773"},
-        {"@id": "http://nla.gov.au/anbd.aut-an35985847"},
-        {"@id": "http://nla.gov.au/anbd.aut-an35698019"}
+  "@graph": [
+    {
+      "@id": "https://dx.doi.org/10.4225/35/555d661071c76",
+      "name": "Farms to Freeways: demonstration DataCrate",
+      "description":
+        "This data set was exported from an Omeka Repository as an example of a DataCrate. It contains the Collections and Items from the repository but does NOT have the exhibitions. The DOI resolves to an archive of the data elsewhere",
+      "publisher": { "@id": "http://westernsydney.edu.au" },
+      "datePublished": "2015",
+      "@type": "Dataset",
+      "path": "./",
+      "name": "Farms to Freeways Example Dataset",
+      "creator": [
+        { "@id": "http://nla.gov.au/anbd.aut-an35048773" },
+        { "@id": "http://nla.gov.au/anbd.aut-an35985847" },
+        { "@id": "http://nla.gov.au/anbd.aut-an35698019" }
       ]
-  },
+    },
 
-  {
-    "@type": "Person",
-    "@id": "http://nla.gov.au/anbd.aut-an35048773",
-    "name": "Deborah Chambers",
-    "givenName": "Deborah",
-    "familyName": "Chambers"
-  },
-  {
-    "@type": "Person",
-    "@id": "http://nla.gov.au/anbd.aut-an35985847",
-    "name": "Carol Liston",
-    "givenName": "Carol",
-    "familyName": "Liston"
-  },
-  {
-    "@type": "Person",
-    "@id": "http://nla.gov.au/anbd.aut-an35698019",
-    "name": "Christine Wieneke",
-    "givenName": "Christine",
-    "familyName": "Wieneke"
-
-  },
+    {
+      "@type": "Person",
+      "@id": "http://nla.gov.au/anbd.aut-an35048773",
+      "name": "Deborah Chambers",
+      "givenName": "Deborah",
+      "familyName": "Chambers"
+    },
+    {
+      "@type": "Person",
+      "@id": "http://nla.gov.au/anbd.aut-an35985847",
+      "name": "Carol Liston",
+      "givenName": "Carol",
+      "familyName": "Liston"
+    },
+    {
+      "@type": "Person",
+      "@id": "http://nla.gov.au/anbd.aut-an35698019",
+      "name": "Christine Wieneke",
+      "givenName": "Christine",
+      "familyName": "Wieneke"
+    },
     {
       "@id": "http://westernsydney.edu.au",
-      "name": "Western Sydney University"
+      "name": "Western Sydney University",
+      "@type": "Organization"
     }
-]
+  ]
 }
