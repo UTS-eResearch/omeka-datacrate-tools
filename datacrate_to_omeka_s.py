@@ -13,20 +13,6 @@ import re
 import argparse
 
 import subprocess
-# try: # for Python 3
-#     from http.client import HTTPConnection
-# except ImportError:
-#     from httplib import HTTPConnection
-#
-#
-#
-# HTTPConnection.debuglevel = 1
-# logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
-# logging.getLogger().setLevel(logging.DEBUG)
-# requests_log = logging.getLogger("urllib3")
-# requests_log.setLevel(logging.DEBUG)
-# requests_log.propagate = True
-
 
 
 
@@ -147,7 +133,7 @@ json_header =  {'Content-Type': 'application/json'};
         
 
 # Item sets (collections)
-for item in [col for col in dc["@graph"] if  "Collection"  in col["@type"] ]:
+for item in [col for col in dc["@graph"] if  "RepositoryCollection"  in col["@type"] ]:
     item_set_to_upload = {}
     id = item["@id"]
     for (k, v) in item.items():
@@ -181,7 +167,7 @@ for item in [col for col in dc["@graph"] if  "Collection"  in col["@type"] ]:
 
         shelf[id] = r.json()
         # Remember which items are part of this collection / item_set
-        for part in item["hasMember"]:
+        for part in []: #item["hasMember"]:
             if part["@id"] not in lookup_collection:
                 lookup_collection[part["@id"]] = []
             lookup_collection[part["@id"]].append(shelf[id]["o:id"])

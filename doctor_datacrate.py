@@ -16,6 +16,7 @@ parser.add_argument(
     "-m", "--mapping", type=argparse.FileType("r"), help="JSON mapping file"
 )
 parser.add_argument("-n", "--no-link", default=False, action='store_true', help="Don't try to cross-link items (eg for Omeka S exports)")
+parser.add_argument("-r", "--remove-omeka-namespace", default=False, action='store_true', help="Remove and keys from the Omeka S namespace after mapping")
 
 args = vars(parser.parse_args())
 catalog = json.load(args["infile"])
@@ -67,6 +68,20 @@ for item in []:  # catalog["@graph"]:
                 else:
                     item[k].append(val)
 
+
+if args["remove_omeka_namespace"]:
+    for item in catalog["@graph"]:
+        to_remove = set()
+        for k, v in item.items():
+            if not isinstance(v, list):
+                v = [v]
+                
+            if k.startswith("o:"):
+                to_remove.add(k)
+        for remove_key in to_remove:
+                item.pop(remove_key)
+             
+            
 
 with args["outfile"] as new:
     new.write(json.dumps(catalog, indent=2))

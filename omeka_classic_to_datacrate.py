@@ -87,7 +87,6 @@ def deal_with_files(graph, item_json, item, data_dir):
 
 
 class Elements:
-
     def __init__(self):
         self.element_names = {}
 
