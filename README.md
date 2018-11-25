@@ -87,11 +87,13 @@ and HTML index page drom the CATALOG.json file created by
 
 -  For this example use this command:
 
+    ```
      python omeka_classic_to_datacrate.py \
          -d ~/working/f2f/farms_to_freeways/files  \
          -u  http://omeka.uws.edu.au/farmstofreeways/api \
          -m ./examples/f2f/F2F-CATALOG-template.json \
          ~/working/f2f/data_migration/CATALOG_raw.json
+    ```
 
 
 
@@ -110,14 +112,16 @@ Once you have run ```omeka_classic_to_datacrate.py``` there should be
 DataCrate-type CATALOG file in migration-data. This file will not be ready to
 use, as the properties and types used in it don't match the DataCrate context
 (which is based on schema.org). For example, the "title" item needs to be
-changed to name. This example ships with a file that does the mapping: ex
+changed to name. This example ships with a file that does the mapping: ```examples/f2f/farms_to_freeways_mapping.json```.
 
 -  Fix the CONTEXT file so it is datacrate_ready using the file supplied to map keys in the JSON-LD created above to DataCrate-friendly keys:
 
+    ```
     python doctor_datacrate.py \
            -m examples/f2f/farms_to_freeways_mapping.json\
            ~/working/f2f/data_migration/CATALOG_raw.json\
           ~/working/f2f/farms_to_freeways/CATALOG.json
+     ```
 
 # Use Calcyte.js to bag the content and create a index.html
 
@@ -125,7 +129,9 @@ To generate HTML (-g), bag (-b) and zip (-z) ```~/working/f2f/farms_to_freeways/
 
 -  use this command:
 
-   calcyfy -z  -g  -b ~/working/f2f/bags/ ~/working/f2f/farms_to_freeways/
+    ```
+    calcyfy -z  -g  -b ~/working/f2f/bags/ ~/working/f2f/farms_to_freeways/
+    ```
 
 
 
@@ -142,5 +148,15 @@ Full instructions coming at some point, but:
    -
 
 -  Run this:
+<<<<<<< HEAD
 
     python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV     -u http://localhost/api/ -s ~/working/f2f/data_migration/saved_ids -d ~/working/f2f/data_migration/s ~/working/f2f/farms_to_freeways/CATALOG.json
+=======
+    ```
+    python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u\
+                  -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV \ 
+                  -u http://localhost/api/ \
+                  -s ~/working/f2f/data_migration/saved_ids  \
+                  ~/working/f2f/farms_to_freeways/CATALOG.json
+    ```
+>>>>>>> 82f7b859aff4c1e7bda320a16a6a543d8730561f

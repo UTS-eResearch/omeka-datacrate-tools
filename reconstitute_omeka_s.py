@@ -13,6 +13,7 @@ import re
 import argparse
 import time
 import subprocess
+import copy
 
 
 class Properties():
@@ -97,6 +98,8 @@ root_dir, _ = os.path.split(args['infile'])
 with open(args["infile"], 'r') as cat:
     dc = json.load(cat)
 
+files_dir, _ = os.path.split(args["infile"])
+
 
 
 key_identity = args["identity"] 
@@ -129,7 +132,8 @@ def upload_media_item(item, parent_item_id):
     #path = "makefile" # hee!
     if  global_id("media", item["@id"]) in shelf:
         item["o:id"] = shelf[global_id("media",item["@id"])]["o:id"]
-    
+    path = os.path.join(files_dir, str(item["o:id"]), item["o:filename"])
+    print("Uploading", path)
     data = {
     "o:ingester": "upload", 
     "file_index": "0", 
@@ -142,11 +146,12 @@ def upload_media_item(item, parent_item_id):
     }
     files = [
          ('data', (None, json.dumps(data), 'application/json')),
-         ('file[0]', ('test.jpg', open('test.jpg', 'rb'), 'image/jpg'))
+         ('file[0]', (path, open(path, 'rb'), 'image/jpg'))
         ]
     
     url = "%smedia" % (host_url)
     r = requests.post(url,  files=files, params=params)
+    print(r.content)
     if "errors" in r.json():
             print("errors", r.json())
     else:
@@ -192,6 +197,7 @@ def check(value, key, to_remove):
         
 
 def update_thing_ids(thing):
+    """ Not sure if this is needed but it removes references to things that don't exist in the saved_data shelf"""
     to_remove = set()
     for key, value in thing.items():
         if isinstance(value, list):
@@ -207,14 +213,17 @@ def update_thing_ids(thing):
 
  
 def upload_anything(type, first_pass=True):
-    
-    for item_to_upload  in dc[type]:
-        media_to_upload = []
-        
+    for item  in dc[type]:
+        item_to_upload = copy.deepcopy(item)
+        media_to_upload = [] 
         id = get_id_from_thing(item_to_upload)
         if id:
             keys_to_lose = set()
-            update_thing_ids(item_to_upload)     
+            if "o:media" in item_to_upload:
+                media_to_upload = item_to_upload["o:media"]
+                print("Saving media to upload", media_to_upload)
+            update_thing_ids(item_to_upload)  
+
             #if "o:slug" in item_to_upload:
             #   item_to_upload.pop("o:slug")
 
@@ -225,8 +234,6 @@ def upload_anything(type, first_pass=True):
                 item_to_upload["o:id"] = prev_id
                 print("Redoing old one: ", id, "to id", prev_id)
                 url = "%s%s/%s?%s" % (host_url, type, prev_id, auth)
-                print(url)
-
                 r = requests.put(url, data=json.dumps(item_to_upload), headers=json_header)    
 
             else:
@@ -240,29 +247,25 @@ def upload_anything(type, first_pass=True):
             item_id = None # TODO actually set this :)
 
             new_item = None
-            try:
-                new_item = r.json()
+            
+            new_item = r.json()
+            if "errors" in new_item:
+                print("errors", r.json())
+                #print(json.dumps(item_to_upload, indent=3))
+            else:
                 shelf[id] = new_item
-                if "errors" in new_item:
-                    print("errors", r.json())
-                    print(json.dumps(item_to_upload, indent=3))
-                    die
-            except:
-                print("we didn't manage to upload that")
+                item_id  = new_item["o:id"]
+                #print(item_to_upload)
+                
+                for media_item in media_to_upload:
+                    print("Media upload for", item_id)
+                    upload_media_item(media_index[media_item["@id"]], item_id)
                 
 
-                
-            if item_id:
-                for media in media_to_upload:
-                    print("Media upload for", item_id)
-                    upload_media_item(media_index[media_item["o:id"]], item_id)
-            else:
-                pass
-                #print("Cant't find an id", new_item)
    
 #TODO VOCABS - need to load the whole thing...
 
 
 for first_pass in [True, False]:
-    for type in ["sites", "site_pages"]:  # "resource_templates", "item_sets", "items",   #"resource_templates", "media" "items"
+    for type in ["sites", "resource_templates", "item_sets", "items"]:  # site_pages has problems https://github.com/omeka/omeka-s/issues/1346
         upload_anything(type, first_pass)
