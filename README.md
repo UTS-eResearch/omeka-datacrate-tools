@@ -3,6 +3,25 @@ Quick and dirty (so far) python3 scripts to push  DataCrates into Omeka S and to
 
 These are not packaged or installable yet.
 
+## The scripts
+
+There are two script for extracting data from Omeka repositories:
+
+-  [`omeka_classic_to_datacrate.py`](./omeka_classic_to_datacrate.py) exports
+   from Omeka Classic repositories into DataCrate format.
+
+-  [`omeka_s_to_datacrate.py`](./omeka_s_to_datacrate.py) exports form Omeka S
+   to DataCrate format, it puts metadata into both CATALOG.json and into a file
+   containing raw Omeka S API data: API.json.
+
+There are two ways to import DataCrate metadata into Omeka S.
+
+-   [`datacrate_to_omeka_s.py`](./datacrate_to_omeka_s.py) will work with ANY
+    DataCrate data, and uses the CATALOG.json file for metadata. To run this the target repository must have the schema.org vocabulary installed.
+-   [`reconstitute_omeka_s.py`](./reconstitute_omeka_s.py) uses the API dump from an omeka site.
+
+
+
 # Audience and platform
 
 This is for experience Python developers
