@@ -26,7 +26,6 @@ class Properties():
         else:
             name = nom
             # Filthy hack but datacrate only supports direct mapping from Key to ID
-            
             url = "%sproperties?%s&per_page=1&term=%s" % (host_url, auth, name)
             print(url)
             res = requests.get(url)
@@ -79,8 +78,6 @@ classes = Resource_classes()
 # TODO - turn these into parameters
 
 
-#key_identity: K9sFGVEAEexubJFvIG0zbzHthLPnDcgD
-#key_credential: n7kC4VN0pGAtcpQbRuGNEwBYxPcBxUtx
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--credential', default=None, help='Omeka API Key')
@@ -267,5 +264,5 @@ def upload_anything(type, first_pass=True):
 
 
 for first_pass in [True, False]:
-    for type in ["sites", "resource_templates", "item_sets", "items"]:  # site_pages has problems https://github.com/omeka/omeka-s/issues/1346
+    for type in ["sites", "site_pages", "resource_templates", "item_sets", "items"]:  # site_pages has problems https://github.com/omeka/omeka-s/issues/1346
         upload_anything(type, first_pass)

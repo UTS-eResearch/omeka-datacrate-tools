@@ -167,10 +167,6 @@ Full instructions coming at some point, but:
    -
 
 -  Run this:
-<<<<<<< HEAD
-
-    python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV     -u http://localhost/api/ -s ~/working/f2f/data_migration/saved_ids -d ~/working/f2f/data_migration/s ~/working/f2f/farms_to_freeways/CATALOG.json
-=======
     ```
     python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u\
                   -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV \ 
@@ -178,4 +174,3 @@ Full instructions coming at some point, but:
                   -s ~/working/f2f/data_migration/saved_ids  \
                   ~/working/f2f/farms_to_freeways/CATALOG.json
     ```
->>>>>>> 82f7b859aff4c1e7bda320a16a6a543d8730561f

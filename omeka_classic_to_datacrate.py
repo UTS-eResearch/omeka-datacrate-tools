@@ -52,9 +52,12 @@ def deal_with_files(graph, item_json, item, data_dir):
                 # Check if we have one the same size already
                 if os.path.exists(file_path):
                     r = requests.head(file_url)
-                    download_size = r.headers[
-                        "content-length"
-                    ] if "content-length" in r.headers else -1
+                    print("HEADERS", r.headers)
+                    if "content-length" in r.headers:
+                        download_size = r.headers[ "content-length"]  
+                    else:
+                        download_size =  -1
+
                     file_size = os.path.getsize(file_path)
                     print("Download size", download_size, "Local file size", file_size)
                     if download_size == str(file_size):
@@ -271,8 +274,8 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
                 item_json["contentLocation"] = {"@id": place_url}
 
             deal_with_files(graph, item_json, item, data_dir)
-
-            get_relations(item_json, id)
+            if not args["no_relations"]:
+                get_relations(item_json, id)
             # print(json.dumps(item_json, indent=4))
             graph.append(item_json)
     catalog = load_collections(endpoint, api_key, data_dir, catalog, parts)
@@ -304,6 +307,13 @@ if __name__ == "__main__":
         "--metadata",
         default=None,
         help="Datacrate Metadata file (CATALOG.json) to use as a base.",
+    )
+    parser.add_argument(
+        "-n",
+        "--no_relations",
+        action='store_true',
+      
+        help="Don't try to fetch item relations",
     )
     parser.add_argument(
         "outfile", nargs="?", type=argparse.FileType("w"), default=sys.stdout

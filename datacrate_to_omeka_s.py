@@ -260,6 +260,8 @@ for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
                 if "hasFile" in item:
                     #print("Uploading files", item['hasFile'])
                     index = 0
+                    if not(isinstance(item['hasFile'], list)):
+                        item['hasFile'] = [item['hasFile']]
                     for f in item['hasFile']:
                         #Hack - move this somewhere nicer
                         if True or "original_" in  f["@id"]:
