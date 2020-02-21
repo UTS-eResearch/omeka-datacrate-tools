@@ -6,7 +6,8 @@
       "description":
         "This data set was exported from an Omeka Repository as an example of a DataCrate. It contains the Collections and Items from the repository but does NOT have the exhibitions. The DOI resolves to an archive of the data elsewhere",
       "publisher": { "@id": "http://westernsydney.edu.au" },
-      "datePublished": "2015",
+      "datePublished": "2015-12-01",
+      "contactPoint" : {"@id": "K.Trewin@westernsydney.edu.au"},
       "@type": "Dataset",
       "path": "./",
       "name": "Farms to Freeways Example Dataset",
@@ -15,6 +16,13 @@
         { "@id": "http://nla.gov.au/anbd.aut-an35985847" },
         { "@id": "http://nla.gov.au/anbd.aut-an35698019" }
       ]
+    },
+    {
+      "@id": "K.Trewin@westernsydney.edu.au",
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": "K.Trewin@westernsydney.edu.au",
+      "name": "Contact Katrina Trewin"
     },
 
     {

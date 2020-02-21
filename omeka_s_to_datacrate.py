@@ -17,7 +17,7 @@ import copy
 import requests
 import pickle
 import sys
-
+import re
 crosswalk = {
     "dcterms:title": "name",
     "dcterms:description": "description",
@@ -103,6 +103,7 @@ def load_collections(endpoint, api_key, catalog, members):
         for item in items:
             if not isinstance(item["@type"], list):
                 item["@type"] = [item["@type"]]
+            item.pop("@context")
             item["@type"].append("RepositoryCollection")
             members.append({"@id": item["@id"]})
             catalog["@graph"].append(item)
@@ -137,10 +138,18 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
                 {"@id": ":_Anonymous_datacrate", "path": "./", "@type": ["Dataset"]}
             ]
         }
+    if not "@context" in catalog:
+        catalog["@context"] = {}
     graph = catalog["@graph"]
     graph[0]["hasPart"] = [] # Schema.org
     graph[0]["hasMember"] = [] # PCDM
+    
+    default_context = json.loads(open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "context.json"), "r").read())
 
+    for key, uri in default_context.items():
+        if not key in catalog["@context"]:
+            catalog["@context"][key] = uri
+    
 
     # By convention... this is bad...
     parts = graph[0]["hasPart"]
@@ -160,52 +169,82 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
         for item in items:
             #print(json.dumps(item, indent=2))
             parts.append({"@id": item["@id"]})
-            item["hasFile"] = []
+            new_item = {}
+            new_item["hasFile"] = []
 
             if "o:item_set" in item:
-                item["memberOf"] = item["o:item_set"]
+                new_item["memberOf"] = item["o:item_set"]
                 item.pop("o:item_set")
 
-            for media_item in item["o:media"]:
-                r = requests.get(media_item["@id"])
-                contents =  r.content.decode()
-                contents = fix_keys(contents)
-                file_metadata = json.loads(contents) 
-                file_url = file_metadata["o:original_url"]
-                file_metadata["@id"] = file_metadata["o:filename"]
-   
-                item["hasFile"].append({"@id": file_metadata["@id"]})
-              
-
-                new_path = os.path.join(data_dir, str(file_metadata["o:id"]))
-                if not os.path.exists(new_path):
-                    os.makedirs(new_path)
-                file_path = os.path.join(new_path, file_metadata["@id"])
-                print("Local filename: %s", file_path)
-                download_this = True
-                # Check if we have one the same size already
-                if os.path.exists(file_path):
-                    r = requests.head(file_url)
-                    download_size = r.headers[
-                        "content-length"
-                    ] if "content-length" in r.headers else -1
-                    file_size = os.path.getsize(file_path)
-                    print("Download size", download_size, "Local file size", file_size)
-                    if download_size == str(file_size):
-                        print(
-                            "Already have a download of the same size: %s" % file_size
-                        )
-                        download_this = False
-
-                if download_this:
-                    # try:
-                    print("Downloading")
-                    r = requests.get(file_url)
-                    open(file_path, "wb").write(r.content)
-                file_metadata["path"] = os.path.relpath(file_path, start=data_dir)
-                graph.append(file_metadata)
+            
+            if "o:media" in item:
+                for media_item in item["o:media"]:
+                    r = requests.get(media_item["@id"])
+                    contents =  r.content.decode()
+                    contents = fix_keys(contents)
+                    file_metadata = json.loads(contents) 
+                    file_metadata.pop("@context")
+                    file_url = file_metadata["o:original_url"]
+                    file_metadata["@id"] = file_metadata["o:filename"]
+    
+                    new_item["hasFile"].append({"@id": file_metadata["@id"]})
                 
-            graph.append(item)
+
+                    new_path = os.path.join(data_dir, str(file_metadata["o:id"]))
+                    if not os.path.exists(new_path):
+                        os.makedirs(new_path)
+                    file_path = os.path.join(new_path, file_metadata["@id"])
+                    print("Local filename: %s", file_path)
+                    download_this = True
+                    # Check if we have one the same size already
+                    if os.path.exists(file_path):
+                        r = requests.head(file_url)
+                        download_size = r.headers[
+                            "content-length"
+                        ] if "content-length" in r.headers else -1
+                        file_size = os.path.getsize(file_path)
+                        print("Download size", download_size, "Local file size", file_size)
+                        if download_size == str(file_size):
+                            print(
+                                "Already have a download of the same size: %s" % file_size
+                            )
+                            download_this = False
+
+                    if download_this:
+                        # try:
+                        print("Downloading")
+                        r = requests.get(file_url)
+                        open(file_path, "wb").write(r.content)
+                    file_metadata["path"] = os.path.relpath(file_path, start=data_dir)
+                    graph.append(file_metadata)
+            
+                item.pop("o:media")
+            new_item["@id"] = str(item["@id"])
+            item.pop("@id")
+            item.pop("@context")
+            for prop, values in item.items():
+                prop = re.sub("^schema:","", prop)
+                if prop not in new_item:
+                    new_item[prop] = []
+
+                if isinstance(values, int):
+                        new_item[prop].append( str(values))
+                
+                elif values:
+                    for value in values:
+                        if isinstance(value, dict) and "@id" in value:
+                            p = {"@id": value["@id"]}
+                            if "@label" in value:
+                                p["@label"] = value["@label"]
+                            new_item[prop].append(p)
+                        elif  isinstance(value, dict) and "@value" in value:
+                            new_item[prop].append(value["@value"])
+                        else:
+                            new_item[prop].append(str(value))
+                        
+                    
+            new_item["@type"].append("RepositoryObject")
+            graph.append(new_item)
     
 
     catalog = load_collections(endpoint, api_key, catalog, members)
@@ -259,7 +298,8 @@ if __name__ == "__main__":
 
     api_graph = {}
     for type in ["vocabularies", "properties", "resource_classes", "resource_templates", "items", "item_sets", "media", "sites", "site_pages" ]:
-        get_all_nodes_of_type(endpoint, auth, data_dir, type, api_graph)
+        #get_all_nodes_of_type(endpoint, auth, data_dir, type, api_graph)
+        pass
 
     """
     items	Yes

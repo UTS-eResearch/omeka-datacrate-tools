@@ -2233,16 +2233,25 @@
           "yearsInOperation": "http://schema.org/yearsInOperation",
           "yield": "http://schema.org/yield",
 
-
-          "contact": "http://schema.org/accountablePerson",
           "File": "http://schema.org/MediaObject",
           "path": "http://schema.org/contentUrl",
-       
-          "hasFile": "https://pcdm.org/models#hasFile",
-          "hasMember": "https://pcdm.org/models#hasMember",
-          "RepositoryCollection": "https://pcdm.org/models#Collection",
-          "RepositoryObject": "https://pcdm.org/models#object",
+          "journal": "http://schema.org/Periodical",
+         
+          
+          "hasFile": "http://pcdm.org/models#hasFile",
+          "hasMember": "http://pcdm.org/models#hasMember",
+          "RepositoryCollection": "http://pcdm.org/models#Collection",
+          "RepositoryObject": "http://pcdm.org/models#object",
+          "@label": "http://www.w3.org/2000/01/rdf-schema#label",
 
-          "@label": "https://www.w3.org/2000/01/rdf-schema#label"
-
+          "pcdm": "http://pcdm.org/models#",
+          "bibo": "http://purl.org/ontology/bibo/",
+          "cc": "http://creativecommons.org/ns#",
+          "dct": "http://purl.org/dc/terms/",
+          "foaf": "http://xmlns.com/foaf/0.1/",
+          "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+          "rdfa": "http://www.w3.org/ns/rdfa#",
+          "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+          "schema": "http://schema.org/",
+          "frapo": "http://purl.org/cerif/frapo/"
 }

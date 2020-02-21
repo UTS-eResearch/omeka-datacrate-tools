@@ -56,7 +56,7 @@ for item in catalog["@graph"]:
                 else:
                     names[val] = item["@id"]
 
-for item in []:  # catalog["@graph"]:
+for item in catalog["@graph"]:  # catalog["@graph"]:
     for k, v in item.items():
         if not isinstance(v, list):
             v = [v]

@@ -75,8 +75,10 @@ def deal_with_files(graph, item_json, item, data_dir):
                     # except:
                     # print ("Some kind of download error happened fetching %s - pressing on" % file_url)
                 file_rel_path = os.path.join(
+                   
                     os.path.basename(data_dir), os.path.relpath(file_path, data_dir)
                 )
+                print("PATHS", file_rel_path, data_dir, file_path)
                 graph.append(
                     {"@type": "File", "path": file_rel_path, "@id": file_rel_path}
                 )
@@ -145,10 +147,11 @@ def get_relations(item_json, id):
     print(endpoint + "/item_relations?subject_item_id=%s"  % (str(id)))
     for rel in relations:
         #relation_name = relation_stash.get_relation_name(rel["property_id"])
-        #print(rel)
-        relation_name = rel["property_local_part"]
-        item_json[relation_name] = {"@id": str(rel["object_item_id"])}
-        print("RELATION", {"@id": str(rel["object_item_id"])})
+        print("rel:", rel)
+        if ("property_local_part" in rel):
+            relation_name = rel["property_local_part"]
+            item_json[relation_name] = {"@id": str(rel["object_item_id"])}
+            print("RELATION", {"@id": str(rel["object_item_id"])})
 
     # {'id': 165, 'subject_item_id': 149,
     # 'property_id': 39, 'object_item_id': 167, 'property_vocabulary_id': 1, 'pro
