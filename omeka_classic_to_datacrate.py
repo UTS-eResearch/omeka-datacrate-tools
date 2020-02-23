@@ -150,9 +150,8 @@ def get_relations(item_json, id):
         print("rel:", rel)
         if ("property_local_part" in rel):
             relation_name = rel["property_local_part"]
-            item_json[relation_name] = {"@id": str(rel["object_item_id"])}
-            print("RELATION", {"@id": str(rel["object_item_id"])})
-
+            item_json[relation_name] = {"@id": "#" + str(rel["object_item_id"])}
+            
     # {'id': 165, 'subject_item_id': 149,
     # 'property_id': 39, 'object_item_id': 167, 'property_vocabulary_id': 1, 'pro
 
@@ -173,7 +172,7 @@ def get_collection_members(id, item_json):
             break
         for item in items:
             print("Member", item["url"])
-            item_json["hasMember"].append({"@id": str(item["id"])})
+            item_json["hasMember"].append({"@id": "#" + str(item["id"])})
         return (item_json)
 
 
@@ -189,7 +188,7 @@ def load_collections(endpoint, api_key, data_dir, catalog, parts):
         print("Got a set of %s collections" % len(items))
         for item in items:
             id = str(item["url"])
-            item_json = {"@id": str(id), "@type": ["RepositoryCollection"]}
+            item_json = {"@id": "#" + str(id), "@type": ["RepositoryCollection"]}
 
             for val in item["element_texts"]:
                 text = val["text"]
@@ -203,7 +202,7 @@ def load_collections(endpoint, api_key, data_dir, catalog, parts):
                 item_json[el_name].append(text)
 
             item_json = get_collection_members(item["id"], item_json)
-            parts.append({"@id": str(id)})
+            parts.append({"@id": "#" + str(id)})
             catalog["@graph"].append(item_json)
     return (catalog)
 
@@ -215,14 +214,21 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
     else:
         catalog = {
             "@graph": [
-                {"@id": "Anonymous_datacrate", "path": "./", "@type": ["Dataset"]}
+                {"@id": "./", "@type": ["Dataset"], "name": "Untitled"},
+                {
+                "@type": "CreativeWork",
+                "@id": "ro-crate-metadata.jsonld",
+                "identifier": "ro-crate-metadata.jsonld",
+                "about": {"@id": "./"}
+                 }
             ]
         }
 
     graph = catalog["@graph"]
+
     graph[0]["hasPart"] = []
 
-    # By convention... this is bad...
+    # By convention root dataset comes first... this is bad...
     parts = graph[0]["hasPart"]
     page = 1
 
@@ -236,7 +242,7 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
         print("Got a set of %s items" % len(items))
         for item in items:
             id = item["id"]
-            item_json = {"@id": str(id), "@type": ["RepositoryObject"]}
+            item_json = {"@id": "#" + str(id), "@type": ["RepositoryObject"]}
             if "item_type" in item and item["item_type"] and "id" in item["item_type"]:
                 item_type = item["item_type"]["id"]
                 item_type_stash.get_item_type_name(item_json, item_type)
