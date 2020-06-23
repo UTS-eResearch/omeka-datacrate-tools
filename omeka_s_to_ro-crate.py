@@ -1,6 +1,6 @@
 """
 
-Quick and dirty script to create a DataCrate from an Omeka Classic repository.
+Quick and dirty script to create a DataCrate from an Omeka-S repository.
 
 """
 
