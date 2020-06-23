@@ -171,7 +171,7 @@ def get_collection_members(id, item_json):
         if items == []:
             break
         for item in items:
-            print("Member", item["url"])
+            print(item)
             item_json["hasMember"].append({"@id": "#" + str(item["id"])})
         return (item_json)
 
@@ -187,8 +187,8 @@ def load_collections(endpoint, api_key, data_dir, catalog, parts):
 
         print("Got a set of %s collections" % len(items))
         for item in items:
-            id = str(item["url"])
-            item_json = {"@id": "#" + str(id), "@type": ["RepositoryCollection"]}
+            id = str(item["id"])
+            item_json = {"@id": "#" + id, "@type": ["RepositoryCollection"]}
 
             for val in item["element_texts"]:
                 text = val["text"]

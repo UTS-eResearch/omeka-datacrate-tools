@@ -1,0 +1,74 @@
+{
+  "@context" : "https://raw.githubusercontent.com/ResearchObject/ro-crate/master/docs/0.2-DRAFT/context.json",
+  "@graph": [
+    {
+      "@type": "CreativeWork",
+      "@id": "ro-crate-metadata.jsonld",
+      "identifier": "ro-crate-metadata.jsonld",
+      "about": {"@id": "./"}
+    },
+    {
+      "@id": "https://dx.doi.org/10.4225/35/555d661071c76",
+      "name": "Dharmae",
+      "description":
+        "This data set was exported from an Omeka Repository as an example of a DataCrate. It contains the Collections and Items from the repository but does NOT have the exhibitions. The DOI resolves to an archive of the data elsewhere. Important Notices  Aboriginal and Torres Strait Islander people:        Please be aware that this website may contain voices, images and/or names of deceased persons.",
+      "publisher": { "@id": "https://ror.org/03f0f6041" },
+      "datePublished": "2015-06-01",
+      "contactPoint": {"@id": "mailto:atsida@uts.edu.au"},
+      "@type": "Dataset",
+      "path": "./",
+      "license": {"@id": "license"},
+      "name": "Dharmae Example Dataset",
+      "creator": [
+        {"@id": "https://orcid.org/0000-0002-8643-5624"},
+        {"@id": "https://orcid.org/0000-0002-4179-4359"}
+      ]
+    },
+    {
+        "@id": "mailto:atsida@uts.edu.au",
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "mailto:atsida@uts.edu.au",
+        "name": "Contact ATSIDA: Aboriginal & Torres Strait Islander Data Archive"
+      },
+
+  
+    {
+        "@id": "license",
+        "name": "Various licenses apply",
+        "@type": "CreativeWork",
+        "description": " If you wish to discuss the inclusion of material in this archive, please email atsida@uts.edu.au All users: Please note that, as far as possible, research materials on this site are provided \u2018as is\u2019. Where views are provided, these may not necessarily reflect the views of UTS and may reflect views from a period which would not be considered appropriate today. Although many materials on this website are licensed CC-BY, please note that some materials have restricted licenses, and some cannot be licensed for reuse other than by the copyright holders. Before copying or reusing materials on this site, please ensure that you check the Access rights and License (if any)."
+      },
+   
+  {
+  "@id": "https://orcid.org/0000-0002-8643-5624",
+  "name": "Heather Goodall",
+  "givenName": "Heather",
+  "familyName": "Goodall",
+  "@type": "Person",
+  "affiliation": "https://ror.org/03f0f6041"
+},
+{
+    "@id": "https://orcid.org/0000-0002-4179-4359",
+    "name": "Jodi Frawley",
+    "givenName": "Jodi",
+    "familyName": "Frawley",
+    "@type": "Person",
+    "affiliation": "https://ror.org/03f0f6041"
+  },
+    {
+      "@id": "https://ror.org/03f0f6041",
+      "name": "University of Technology Sydney",
+      "@type": "Organization"
+    },
+    {
+        "@id" : "https://www.dpi.nsw.gov.au/fishing/habitat/publications/pubs/talking-fish-in-the-murray-darling-basin",
+        "name": "Frawley, J., Nichols, S., Goodall, H. and Baker, E. (2012). Talking fish: Making connections with the rivers of the Murray-Darling Basin, Murray-Darling Basin Authority, Canberra.",
+        "@type": "ScholarlyWork",
+        "creator": [
+            {"@id": "https://orcid.org/0000-0002-8643-5624"},
+            {"@id": "https://orcid.org/0000-0002-4179-4359"}
+          ]
+    }
+  ]
+}

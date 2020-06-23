@@ -1,5 +1,6 @@
 # omeka-datacrate-tools
-Quick and dirty (so far) python3 scripts to push  DataCrates into Omeka S and to move data out of Omeka Classic
+
+Quick and dirty (so far) python3 scripts to push  DataCrates/RO-Crates in and out of Omeka S and to move data out of Omeka Classic. As time permits we're updating these scripts to follow the [RO-Crate specification](https://researchobject.github.io/ro-crate/).
 
 These are not packaged or installable yet.
 
@@ -10,7 +11,7 @@ There are two script for extracting data from Omeka repositories:
 -  [`omeka_classic_to_datacrate.py`](./omeka_classic_to_datacrate.py) exports
    from Omeka Classic repositories into DataCrate format.
 
--  [`omeka_s_to_datacrate.py`](./omeka_s_to_datacrate.py) exports form Omeka S
+-  [`omeka_s_to_ro-crate.py`](./omeka_s_to_ro-crate.py) exports from Omeka S
    to DataCrate format, it puts metadata into both CATALOG.json and into a file
    containing raw Omeka S API data: API.json.
 
@@ -74,7 +75,7 @@ and HTML index page drom the CATALOG.json file created by
     ```
 
 
-# Download data
+# Download data from Omeka Classic
 
 -  To see what the ```omeka_classic_to_datacrate.py``` script takes as arguments type:
 
@@ -141,6 +142,39 @@ changed to name. This example ships with a file that does the mapping: ```exampl
            ~/working/f2f/data_migration/CATALOG_raw.json\
           ~/working/f2f/farms_to_freeways/CATALOG.json
      ```
+
+# Download data from Omeka S
+
+Use the script `omeka_s_to_ro-crate.py`.
+
+Usage:
+```
+> python omeka_s_to_ro-crate.py -h
+usage: omeka_s_to_ro-crate.py [-h] [-k KEY_IDENTITY] [-c KEY_CREDENTIAL]
+                              [-u API_URL] [-d DOWNLOAD_CACHE] [-m METADATA]
+                              [outfile]
+
+positional arguments:
+  outfile
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -k KEY_IDENTITY, --key-identity KEY_IDENTITY
+                        Omeka S Key indetity
+  -c KEY_CREDENTIAL, --key-credential KEY_CREDENTIAL
+                        Omeka S Key credential
+  -u API_URL, --api_url API_URL
+                        Omeka API Endpoint URL (hint, ends in /api)
+  -d DOWNLOAD_CACHE, --download_cache DOWNLOAD_CACHE
+                        Path to a directory in which to cache dowloads
+                        (defaults to ./data)
+  -m METADATA, --metadata METADATA
+                        Datacrate Metadata file (CATALOG.json) to use as a
+                        base.
+```
+
+See the above section on downloading from Omeka Classic for how to fix the resulting file using `doctor_datacrate.py`
+
 
 # Use Calcyte.js to bag the content and create a index.html
 

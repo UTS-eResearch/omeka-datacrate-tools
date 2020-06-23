@@ -4,7 +4,6 @@ Quick and dirty script to create a DataCrate from an Omeka Classic repository.
 
 """
 
-
 from sys import stdout, stdin
 import argparse
 import json
@@ -72,8 +71,10 @@ def deal_with_files(graph, item_json, item, data_dir):
                 file_rel_path = os.path.join(
                     os.path.basename(data_dir), os.path.relpath(file_path, data_dir)
                 )
+                
+
                 graph.append(
-                    {"@type": "File", "path": file_rel_path, "@id": file_rel_path}
+                    {"@type": "File", "@id": file_rel_path, "dc_title": file_rel_path}
                 )
                 if file_type == "thumbnail":
                     print("Thumb!", file_rel_path)
@@ -105,8 +106,11 @@ def load_collections(endpoint, api_key, catalog, members):
                 item["@type"] = [item["@type"]]
             item.pop("@context")
             item["@type"].append("RepositoryCollection")
-            members.append({"@id": item["@id"]})
-            catalog["@graph"].append(item)
+            new_item = {}
+            fixProps(item, new_item, catalog["@graph"])
+            members.append({"@id": new_item["@id"]})
+            # TODO - handle this data structure better
+            catalog["@graph"].append(new_item)
 
 
     return (catalog)
@@ -135,7 +139,13 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
     else:
         catalog = {
             "@graph": [
-                {"@id": ":_Anonymous_datacrate", "path": "./", "@type": ["Dataset"]}
+                {"@id": "./", "@type": ["Dataset"]},
+                {
+                    "@type": "CreativeWork",
+                    "@id": "ro-crate-metadata.jsonld",
+                    "conformsTo": {"@id": "https://w3id.org/ro/crate/1.0"},
+                    "about": {"@id": "./"}
+                 }
             ]
         }
     if not "@context" in catalog:
@@ -146,12 +156,10 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
     
     default_context = json.loads(open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "context.json"), "r").read())
 
-    for key, uri in default_context.items():
-        if not key in catalog["@context"]:
-            catalog["@context"][key] = uri
+  
     
 
-    # By convention... this is bad...
+    # Getting root dataset by convention... this is bad...
     parts = graph[0]["hasPart"]
     members = graph[0]["hasMember"]
 
@@ -171,6 +179,9 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
             parts.append({"@id": item["@id"]})
             new_item = {}
             new_item["hasFile"] = []
+            new_item["@id"] = str(item["@id"])
+            item.pop("@id")
+            item.pop("@context")
 
             if "o:item_set" in item:
                 new_item["memberOf"] = item["o:item_set"]
@@ -187,7 +198,6 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
                     file_url = file_metadata["o:original_url"]
                     file_metadata["@id"] = file_metadata["o:filename"]
     
-                    new_item["hasFile"].append({"@id": file_metadata["@id"]})
                 
 
                     new_path = os.path.join(data_dir, str(file_metadata["o:id"]))
@@ -215,33 +225,22 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
                         print("Downloading")
                         r = requests.get(file_url)
                         open(file_path, "wb").write(r.content)
-                    file_metadata["path"] = os.path.relpath(file_path, start=data_dir)
-                    graph.append(file_metadata)
+                    new_file = {}
+
+                    file_metadata["@id"] = os.path.relpath(file_path, start=data_dir)
+                    new_item["hasFile"].append({"@id": file_metadata["@id"]})
+
+                    fixProps(file_metadata, new_file, graph)
+                    
+                   
+                    if "dcterms:title" not in new_file:
+                        new_file["dcterms:title"] = new_file["@id"]
+                    graph.append(new_file)
             
                 item.pop("o:media")
-            new_item["@id"] = str(item["@id"])
-            item.pop("@id")
-            item.pop("@context")
-            for prop, values in item.items():
-                prop = re.sub("^schema:","", prop)
-                if prop not in new_item:
-                    new_item[prop] = []
-
-                if isinstance(values, int):
-                        new_item[prop].append( str(values))
-                
-                elif values:
-                    for value in values:
-                        if isinstance(value, dict) and "@id" in value:
-                            p = {"@id": value["@id"]}
-                            if "@label" in value:
-                                p["@label"] = value["@label"]
-                            new_item[prop].append(p)
-                        elif  isinstance(value, dict) and "@value" in value:
-                            new_item[prop].append(value["@value"])
-                        else:
-                            new_item[prop].append(str(value))
-                        
+         
+            
+            fixProps(item, new_item, graph)            
                     
             new_item["@type"].append("RepositoryObject")
             graph.append(new_item)
@@ -249,8 +248,40 @@ def load_items(endpoint, api_key, data_dir, metadata_file):
 
     catalog = load_collections(endpoint, api_key, catalog, members)
     with args["outfile"] as j:
+        #print(catalog)
         j.write(json.dumps(catalog, indent=3))
 
+def fixProps(item, new_item, graph):
+    for prop, values in item.items():
+        
+        prop = re.sub("^schema:","", prop)
+
+        if values and isinstance(values, list):
+            if prop not in new_item:
+                new_item[prop] = []
+            for value in values:
+                new_item[prop].append(fixValue(value, graph))
+        else:
+            new_item[prop] = str(values)
+
+def fixValue(value, graph):
+    if isinstance(value, dict) and "@id" in value:
+        if value["type"] == "uri":
+            urlItem = {
+                "@id": value["@id"],
+                "@type": "URL",
+                "name": value["@id"]
+                }
+            if "@label" in value:
+                urlItem["name"] =  value["@label"]
+            graph.append(urlItem)
+        
+        return {"@id": value["@id"]}
+    elif  isinstance(value, dict) and "@value" in value:
+        return value["@value"]
+    else:
+        return str(value)
+                
 
 # Define and parse command-line arguments
 
@@ -319,6 +350,8 @@ if __name__ == "__main__":
     """
 
     api_filename = os.path.join(data_dir, "API.json")
+
+
     with open(api_filename, "w") as api:
         api.write(json.dumps(api_graph, indent=3))
   

@@ -67,6 +67,8 @@ for item in catalog["@graph"]:  # catalog["@graph"]:
                     item[k].append({"@id": names[val], "@label": val})
                 else:
                     item[k].append(val)
+            if len(item[k]) == 1:
+                item[k] = item[k][0]
 
 
 if args["remove_omeka_namespace"]:

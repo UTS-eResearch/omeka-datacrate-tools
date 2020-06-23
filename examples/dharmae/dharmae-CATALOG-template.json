@@ -1,0 +1,25 @@
+{
+  "@graph": [
+    {
+      "@id": "https://dx.doi.org/10.4225/35/555d661071c76",
+      "name": "Dharmae - ",
+      "description":
+        "This data set was exported from an Omeka Repository as an example of a DataCrate. It contains the Collections and Items from the repository but does NOT have the exhibitions. The DOI resolves to an archive of the data elsewhere",
+      "publisher": { "@id": "http://uts.edu.au" },
+      "datePublished": "2015",
+      "@type": "Dataset",
+      "path": "./",
+      "name": "Dharmae Example Dataset",
+      "creator": [
+       
+      ]
+    },
+
+    
+    {
+      "@id": "http://uts.edu.au",
+      "name": "University of Technology Sydney",
+      "@type": "Organization"
+    }
+  ]
+}
