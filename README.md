@@ -188,23 +188,43 @@ To generate HTML (-g), bag (-b) and zip (-z) ```~/working/f2f/farms_to_freeways/
 
 
 
-# TODO: More! Upload the data into Omeka S
+# Upload RO-Crate data into Omeka S
 
-Full instructions coming at some point, but:
 
--  Install Omeka S
+
+-  Install Omeka S - eg from here: https://git.research.uts.edu.au/eresearch/infra-aws-omeka-s/-/tree/master/docker
 
 -  Load the Schema.org vocab into Omeka S
    - Go to https://schema.org/docs/developers.html
    -  Download the Vocabulary definition file for schema in Format: Triples
-   -  In Omeka S, click on Vocabularies and add schema.nt
-   -
+      <https://schema.org/version/latest/schemaorg-current-http.ttl>
+   -  In Omeka S:
+      -  click on Vocabularies and add Sechma.org using the file you downloaded above schemaorg-current-http.ttl
+      -  Get an API key identity and crednetial (under Users)
+
+
+-  Define environment variables like:
+   ```
+   export OMEKA_KEY_IDENTITY=bJCEy...j
+   export OMEKA_KEY_CREDENTIAL=9Fzvqy...O
+
+   ```
+
 
 -  Run this:
     ```
-    python datacrate_to_omeka_s.py   -i ofiCqzOrQyOEAvRlt09Ii26ywxK7674u\
-                  -c iq0AcRgHSQBs5MqTqwwrRNXxGGVo2uHV \ 
-                  -u http://localhost/api/ \
-                  -s ~/working/f2f/data_migration/saved_ids  \
-                  ~/working/f2f/farms_to_freeways/CATALOG.json
+    python datacrate_to_omeka_s.py   -u http://localhost/api/ -s ~/working/f2f/data_migration/saved_ids  ~/working/f2f/farms_to_freeways/CATALOG.json -f
     ```
+
+
+TIPS / troubleshooting:
+
+-  Files failing to upload? YOu need to set the upload limit in PHP (TODO: how???)
+
+-  If you have errors then the local cache of IDs might get corrupted, delele it:
+  ```
+  rm ~/working/f2f/data_migration/saved_ids
+  ```
+
+-  To turn off file uploads remove the -f option - this will speed things up considerably for testing.
+

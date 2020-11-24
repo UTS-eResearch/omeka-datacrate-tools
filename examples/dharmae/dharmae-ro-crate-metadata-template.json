@@ -2,12 +2,6 @@
   "@context" : "https://raw.githubusercontent.com/ResearchObject/ro-crate/master/docs/0.2-DRAFT/context.json",
   "@graph": [
     {
-      "@type": "CreativeWork",
-      "@id": "ro-crate-metadata.jsonld",
-      "identifier": "ro-crate-metadata.jsonld",
-      "about": {"@id": "./"}
-    },
-    {
       "@id": "https://dx.doi.org/10.4225/35/555d661071c76",
       "name": "Dharmae",
       "description":
@@ -23,6 +17,13 @@
         {"@id": "https://orcid.org/0000-0002-8643-5624"},
         {"@id": "https://orcid.org/0000-0002-4179-4359"}
       ]
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "ro-crate-metadata.json",
+      "identifier": "ro-crate-metadata.json",
+      "conformsTo": {"@id": "https://w3id.org/ro/crate/1.1"},
+      "about": {"@id": "./"}
     },
     {
         "@id": "mailto:atsida@uts.edu.au",

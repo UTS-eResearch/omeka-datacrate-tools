@@ -1,5 +1,5 @@
 """
-Quick and dirty script to push Datacrate to Omeka
+Quick and dirty script to push Datacrate to Omeka-S
 """
 
 import json
@@ -19,27 +19,29 @@ import subprocess
 class Properties():
     def __init__(self):
         self.prop_ids = {}
+    
     def get_prop_id(self, nom):
-        
         if nom in self.prop_ids:
             return self.prop_ids[nom]
+
         elif nom in context:
             name = context[nom]
-            # Filthy hack but datacrate only supports direct mapping from Key to ID
-            name = name.replace("https://schema.org/", "schema:")
-
             if "@id" in name:
                 name = name["@id"]
+            # HACK - need to deal with other vocabs at some point
+            name = name.replace("http://schema.org/", "schema:")
+
             url = "%sproperties?%s&per_page=1&term=%s" % (host_url, auth, name)
             res = requests.get(url)
             prop_data = res.json()
             if prop_data and "o:id" in prop_data[0]:
+                print(prop_data)
                 self.prop_ids[nom] = prop_data[0]["o:id"]
                 #print("Getting prop.", nom, self.prop_ids[nom])
                 return self.prop_ids[nom]
 
         else:
-             return None
+            return None
 
 class JSON_Index():
     def __init__(self, json_ld):
@@ -51,6 +53,7 @@ class JSON_Index():
 class Resource_classes():
       def __init__(self):
           self.prop_ids = {}
+
       def get_class_id(self,names):
           if not isinstance(names, list):
              names = [names]
@@ -82,13 +85,9 @@ classes = Resource_classes()
 # TODO - turn these into parameters
 
 
-#key_identity: K9sFGVEAEexubJFvIG0zbzHthLPnDcgD
-#key_credential: n7kC4VN0pGAtcpQbRuGNEwBYxPcBxUtx
-
 parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--credential', default=None, help='Omeka API Key')
-parser.add_argument('-i', '--identity', default=None, help='Omeka API identify')
 parser.add_argument('-u', '--api-url',default=None, help='Omeka API Endpoint URL (hint, ends in /api/)')
+parser.add_argument('-f', '--files', action="store_true", help='Upload files - default is false')
 parser.add_argument('-s', '--shelf', default="saved_data", help='Where to stash intermediate results')
 parser.add_argument('-d', '--download_cache', default="./content", help='Path to a directory in which to chache dowloads (defaults to ./data)')
 parser.add_argument('-j', '--json-ld', default="./CATALOG.json", help="Datacrate style JSON-LD file")
@@ -102,18 +101,35 @@ root_dir, _ = os.path.split(args['infile'])
 
 with open(args["infile"], 'r') as cat:
     dc = json.load(cat)
+cont = dc["@context"]
+context = {}
 
-context = dc["@context"]
+if isinstance(cont, str):
+    r = requests.get(cont)
+    context.update(r.json()["@context"])
+
+else:
+    for c in cont:
+        if isinstance(c, dict):
+            context.update(c)
+        elif c.startswith("http"):
+            r = requests.get(c)
+            context.update(r.json()["@context"])
+
+
+
 json_index = JSON_Index(dc)
 
-# Hack ... not sure if this is the best way
+# Hack ... not sure if this is the best way but Omeka seems to be built around having these on every page
 context["name"] = "dcterms:title"
 context["description"] = "dcterms:description"
 
-key_identity = args["identity"] 
-key_credential = args["credential"] 
+print(os.environ)
+key_identity = os.environ['OMEKA_KEY_IDENTITY']
+key_credential = os.environ['OMEKA_KEY_CREDENTIAL']
 
 host_url = args["api_url"]
+upload_files = args["files"]
 
 if not host_url.endswith("/"):
     host_url += "/"# "http://localhost/api/"
@@ -123,7 +139,7 @@ shelf = shelve.open(args["shelf"]) # Remember what's been uploaded before keyed 
 lookup_collection = {} # Keyed by datacrate id, lists omeka IDs for collections
 
 
-upload_files = False
+
 
 auth = "key_identity=%s&key_credential=%s" % (key_identity, key_credential)
 json_header =  {'Content-Type': 'application/json'};
@@ -152,18 +168,16 @@ for item in [col for col in dc["@graph"] if  "RepositoryCollection"  in col["@ty
                     })
     if item_set_to_upload:
         if id in shelf:
-            #print("Redoing old one", shelf[id])
+            print("Redoing old set", id)
             prev_id = shelf[id]["o:id"]
             r = requests.put("%sitem_sets/%s?%s" % (host_url, prev_id, auth),
                                             data=json.dumps(item_set_to_upload), headers=json_header)
             #print(r.content)
-            print("Uploaded item set", id)
 
         else:
-            print("Making new one")
+            print("Uploading new set", id)
             r  = requests.post("%sitem_sets?%s" % (host_url, auth),
                                             data=json.dumps(item_set_to_upload), headers=json_header)
-            print(r.content)
 
         shelf[id] = r.json()
         # Remember which items are part of this collection / item_set
@@ -182,8 +196,7 @@ for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
         types = item["@type"]
         if not isinstance(types, list):
             types = [types]
-        if not("File" in types and not upload_files):
-
+        if not("File" in types):
             item_to_upload["o:resource_class"] = {
                 "o:id": classes.get_class_id(types[-1])
                 }
@@ -198,6 +211,7 @@ for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
                 if prop_id:
                     item_to_upload[k] = []
                     for val in vals:
+
                         if "@id" in val and val["@id"] in shelf:
                             if "o:id" in shelf[val["@id"]]:
                                 item_to_upload[k].append({
@@ -227,7 +241,6 @@ for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
                                     })
 
             if item_to_upload:
-                #print ("ITEM", item_to_upload)
                 if "dcterms:title" not in item_to_upload and "path" in item:
                     item_to_upload["dcterms:title"] = [{
                         "type": "literal",
@@ -254,10 +267,10 @@ for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
                     #print("Uploaded", item_to_upload)
                 shelf[id] = r.json()
 
-                    #print("Stored", [t][title])
+                print("Stored", id)
 
 
-                if "hasFile" in item:
+                if "hasFile" in item and upload_files:
                     #print("Uploading files", item['hasFile'])
                     index = 0
                     if not(isinstance(item['hasFile'], list)):
@@ -283,7 +296,8 @@ for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
                                     }
                                 filename = json_index.item_by_id[f["@id"]]["path"]
                                 if isinstance(filename, list):
-                                    filename = [0]
+                                    filename = filename[0]
+                                print(filename)
                                 path = os.path.join(root_dir, filename)
                                 print(path)
                                 if os.path.exists(path):
