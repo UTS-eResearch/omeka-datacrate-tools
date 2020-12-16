@@ -1,5 +1,9 @@
 """
-Quick and dirty script to push Datacrate to and experimental huni XML output
+Quick and dirty script to push Datacrate to an experimental huni XML output
+
+HuNI has no standard input format this will need a custom harvester 
+
+Finds 
 """
 
 import json
