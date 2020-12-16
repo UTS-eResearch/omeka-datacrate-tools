@@ -3,7 +3,14 @@ Quick and dirty script to push Datacrate to an experimental huni XML output
 
 HuNI has no standard input format this will need a custom harvester 
 
-Finds 
+This converts all of the items with a @type RepostitoryObject into an XML file with the format
+
+<datacrate>
+    <record> </record>
+
+    ...
+    <record> </record>
+</datacrate>
 """
 
 import json
