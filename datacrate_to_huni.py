@@ -77,11 +77,10 @@ for item in dc["@graph"]:
                 
                 xml += f'     <meta name="{escape(prop)}" ref="{escape(id)}">{escape(v)}</meta>\n'
         xml += " </record>\n"
-        with open(os.path.join(args["outdir"], id.replace("/","_").replace(":","_").replace("&","_") + ".xml"), 'w') as out:
-             out.write(xml)
-
-
+     
 xml += "</datacrate>"
+with open(os.path.join(args["outdir"], id.replace("/","_").replace(":","_").replace("&","_") + ".xml"), 'w') as out:
+    out.write(xml)
 
 
 
