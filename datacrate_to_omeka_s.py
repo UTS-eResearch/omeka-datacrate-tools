@@ -1,6 +1,3 @@
-"""
-Quick and dirty script to push Datacrate to Omeka-S
-"""
 
 import json
 import shelve
@@ -30,13 +27,12 @@ class Properties():
                 name = name["@id"]
             # HACK - need to deal with other vocabs at some point
             name = name.replace("http://schema.org/", "schema:")
-
             url = "%sproperties?%s&per_page=1&term=%s" % (host_url, auth, name)
             res = requests.get(url)
             prop_data = res.json()
-            print(prop_data)
+            #print(prop_data)
             if prop_data and "o:id" in prop_data[0]:
-                print(prop_data)
+                print(nom, prop_data)
                 self.prop_ids[nom] = prop_data[0]["o:id"]
                 #print("Getting prop.", nom, self.prop_ids[nom])
                 return self.prop_ids[nom]
@@ -53,27 +49,33 @@ class JSON_Index():
 
 class Resource_classes():
       def __init__(self):
-          self.prop_ids = {}
+          self.class_ids = {}
 
       def get_class_id(self,names):
           if not isinstance(names, list):
              names = [names]
-
+          print("Gettng CLASSES", names)
           for nom in names:
-              if nom in self.prop_ids:
-                  return self.prop_ids[nom]
+              
+              if nom in self.class_ids:
+                  return self.class_ids[nom]
               elif nom in context:
                   name = context[nom]
+                  # HACK HACK HACK
+                  name = name.replace("http://schema.org/", "schema:")
+
                   if "@id" in name:
                       name = name["@id"]
                   url = "%sresource_classes?%s&per_page=100000&term=%s" % (host_url, auth, name)
+                  print(url)
                   r = requests.get(url)
                   #print(r.content)
                   prop_data = r.json()
 
                   if prop_data and "o:id" in prop_data[0]:
-                      self.prop_ids[nom] = prop_data[0]["o:id"]
-                      return self.prop_ids[nom]
+                      self.class_ids[nom] = prop_data[0]["o:id"]
+                      print("CLASS", self.class_ids[nom])
+                      return self.class_ids[nom]
 
                   else:
                        #print("Can't find this class", name )
@@ -125,7 +127,6 @@ json_index = JSON_Index(dc)
 context["name"] = "dcterms:title"
 context["description"] = "dcterms:description"
 
-print(os.environ)
 key_identity = os.environ['OMEKA_KEY_IDENTITY']
 key_credential = os.environ['OMEKA_KEY_CREDENTIAL']
 
@@ -267,7 +268,7 @@ for item in [col for col in dc["@graph"] if "Collection" not in col["@type"]]:
                                                     data=json.dumps(item_to_upload), headers=json_header)
                     #print("Uploaded", item_to_upload)
                 shelf[id] = r.json()
-
+                print(r.json())
                 print("Stored", id)
 
 
