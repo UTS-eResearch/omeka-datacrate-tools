@@ -129,8 +129,8 @@ and HTML index page drom the CATALOG.json file created by
 
 
 Once you have run ```omeka_classic_to_datacrate.py``` there should be
-DataCrate-type CATALOG file in migration-data. This file will not be ready to
-use, as the properties and types used in it don't match the DataCrate context
+DataCrate-type "ro-crate-metadata-raw.json" file in migration-data. This file will not be ready to
+use, as the properties and types used in it don't match the RO-Crate context
 (which is based on schema.org). For example, the "title" item needs to be
 changed to name. This example ships with a file that does the mapping: ```examples/f2f/farms_to_freeways_mapping.json```.
 
@@ -139,8 +139,8 @@ changed to name. This example ships with a file that does the mapping: ```exampl
     ```
     python doctor_datacrate.py \
            -m examples/f2f/farms_to_freeways_mapping.json\
-           ~/working/f2f/data_migration/CATALOG_raw.json\
-          ~/working/f2f/farms_to_freeways/CATALOG.json
+           ~/working/f2f/data_migration/ro-crate-metadata-raw.json\
+          ~/working/f2f/farms_to_freeways/ro-crate-metadata.json
      ```
 
 # Download data from Omeka S
